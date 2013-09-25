@@ -1,4 +1,7 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,8 +36,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 
 public class CalendarProject extends JFrame implements ComponentListener {//all event information stored in CalendarProject function
@@ -49,6 +58,7 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 	private static JLabel dateLabel = new JLabel();
 	private static JLabel eventLabel = new JLabel();
 	private static JPanel eventsPanel = new JPanel();//pane to display the events of that day 
+	private static JPanel info;
 	private static ArrayList <JLabel> listOfLabels = new ArrayList<JLabel>();//list of JLabels
 	private static File homeFile;
 	private final Font BOLD_FONT = new Font ("Segoe UI", Font.BOLD,20);
@@ -60,7 +70,7 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 		 myYears = createYears(y,n);
 		 
 		 JPanel content = new JPanel (new GridBagLayout());
-		 JPanel info = new JPanel (new GridBagLayout());
+		 info = new JPanel (new GridBagLayout());
 		 JButton addEventButton = new JButton();
 		 JButton modifyButton = new JButton("Modify...");
 		 JButton addButton = new JButton("Add Event");
@@ -131,8 +141,8 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 		content.add(display,c);
 		
 		//layout for information panel
-		d.fill=GridBagConstraints.NONE;
-		d.anchor=GridBagConstraints.CENTER;
+		d.fill=GridBagConstraints.BOTH;
+		d.anchor=GridBagConstraints.LINE_START;
 		d.gridx = 0;
 		d.gridy = 0;
 		d.gridwidth = 10;
@@ -146,8 +156,11 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 		d.gridy = 2;
 		d.gridx = 1;
 		d.gridheight = 10;
+		d.gridwidth = 10;
 		d.weighty = 1.0;
+		d.insets = new Insets(20, 10, 0,0);
 		info.add(eventsPanel,d);
+		d.insets = new Insets(0, 10, 0,0);
 		d.gridy = 13;
 		d.gridx = 1;
 		d.gridwidth = 1;
@@ -350,6 +363,37 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 		
 	}
 	
+	public static void setInformationPanel (Box b, List<String> headlines)
+	{
+		Day d = b.getDayStored();
+		Month m = b.getMonthStored();
+		Year y = b.getYearStored();
+		dayLabel.setText(d.getName().toUpperCase());
+		dateLabel.setText(m.getName()+" "+d.getNum()+", "+y.getNumber());
+		GridBagConstraints c = new GridBagConstraints();
+		eventsPanel.setLayout(new BorderLayout());//panel to display the list of activities
+		listOfLabels.clear();
+		eventsPanel.removeAll();
+		c.gridx=0;
+		c.gridy = 0;
+		c.gridheight = 10;
+		c.gridwidth = 10;
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.LINE_START;
+		JTextArea area = new JTextArea();
+				
+		for (String story : headlines)
+			area.append("- " + story + "\n\n");
+		
+		area.setLineWrap(true);
+		area.setWrapStyleWord(true);
+		area.setEditable(false);
+		area.setBackground(new Color(238, 238, 238));			
+		eventsPanel.add(area, "North");
+	}
+	
 	public static void setInformationPanel(Box b)
 	{
 		Day d = b.getDayStored();
@@ -388,6 +432,33 @@ public class CalendarProject extends JFrame implements ComponentListener {//all 
 			c.gridy = num;
 		}
 		
+	}
+	
+	public static List<String> getHeadLines()
+	{
+		List<String> events = new ArrayList<String>();
+		
+		Document doc;
+		try {
+			doc = Jsoup.connect("http://en.wikipedia.org/wiki/Main_Page").timeout(10*1000).get();//gets the page source
+			Elements newsHeadlines = doc.select("#mp-itn li");//# indicates the id and li indicates the tag, gets the elements between the two tags
+			//Element firstchild = first.child(0);//gets the first element inside
+			//String html = first.html();//gets the html code within the element
+			//String texts = first.ownText();//gets the text within only the element
+
+			for (int i = 0;i<newsHeadlines.size();i++)
+			{
+				Element news = newsHeadlines.get(i);
+				String text = news.text();
+				events.add(text);
+			}			
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// TODO Auto-generated method stub
+		return events;
 	}
 	
 	public static void updates(Year year)//update the events in the year and the displayed event

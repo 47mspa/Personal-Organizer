@@ -18,6 +18,7 @@ public class EditWindow extends JFrame {
 	private Box b;
 	private Day d;
 	private Month m;
+	private Year y;
 	private final Image icon = loadImage("logo.png");
 
 	public EditWindow(Box box)
@@ -29,6 +30,7 @@ public class EditWindow extends JFrame {
 		Box b = box;
 		d = b.getDayStored();//get the day stored by the box that is double clicked by the user
 		m = b.getMonthStored();
+		y = b.getYearStored();
 		JLabel date = new JLabel ();
 		JLabel eventTitle = new JLabel("Event Title: ");
 		JLabel startTime = new JLabel("Start Time: ");
@@ -53,7 +55,7 @@ public class EditWindow extends JFrame {
 		JButton cancel = new JButton("Cancel");
 		
 
-		date.setText("Date:                "+d.getName()+", "+ m.getName()+" "+d.getNum()+", 2012");
+		date.setText("Date:                "+d.getName()+", "+ m.getName()+" "+d.getNum()+", "+y.getNumber());
 		descrip.setFont(used);
 		description.setFont(used);
 		date.setFont(used);
@@ -137,7 +139,7 @@ public class EditWindow extends JFrame {
 		this.setContentPane(content);
 		this.setResizable(false);
 		this.setSize(700,450);
-		this.setTitle(d.getName()+", "+ m.getName()+" "+d.getNum()+", 2012");
+		this.setTitle(d.getName()+", "+ m.getName()+" "+d.getNum()+", " + y.getNumber());
 		this.setLocationRelativeTo(null);
 		this.setIconImage(icon);
 		this.setAlwaysOnTop(true);

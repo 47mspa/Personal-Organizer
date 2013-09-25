@@ -46,7 +46,7 @@ public class CalendarDrawArea extends JPanel implements MouseListener, KeyListen
 		cursor.setDayStored(currentDay);
 		cursor.setMonthStored(currentMonth);
 		cursor.setYearStored(currentYear);
-		CalendarProject.setInformationPanel(cursor);
+		CalendarProject.setInformationPanel(cursor, CalendarProject.getHeadLines());
 		  
         for (int j = 0;j<6;j++)//nested loop to add boxes, loop to go through weeks in a month
         {
